@@ -17,7 +17,9 @@ import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.team.s.sapp.MainActivity;
 import com.team.s.sapp.R;
+import com.team.s.sapp.fragment.main.MainFragment;
 
 import java.util.concurrent.TimeUnit;
 
@@ -69,6 +71,9 @@ public class LoginFragment extends Fragment {
         switch (view.getId()) {
 
             case R.id.btnLogin:
+
+                MainActivity.mainActivity.replaceMainFragment();
+                MainActivity.mainActivity.goneLoginFragment();
                 break;
 
             case R.id.btnRegister:
@@ -89,8 +94,7 @@ public class LoginFragment extends Fragment {
         }
     }
 
-    public void getCode()
-    {
+    public void getCode() {
         String phone_number = "+84"+edtPhoneRegister.getText().toString();
 
         setupVerificationCallback();
@@ -107,7 +111,6 @@ public class LoginFragment extends Fragment {
         verificationcallback = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             @Override
             public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
-
                 //time out
             }
 
@@ -126,7 +129,6 @@ public class LoginFragment extends Fragment {
 
             @Override
             public void onCodeSent(String s, PhoneAuthProvider.ForceResendingToken forceResendingToken) {
-//                phoneverifyId = s;
                 resendingToken = forceResendingToken;
             }
         };
