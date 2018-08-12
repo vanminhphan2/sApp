@@ -11,20 +11,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import com.daimajia.swipe.util.Attributes;
 import com.team.s.sapp.MainActivity;
 import com.team.s.sapp.R;
 import com.team.s.sapp.adapter.main.chat.BoxAdapter;
+import com.team.s.sapp.dialog.NumberPickerDialog;
 import com.team.s.sapp.fragment.main.MainFragment;
+import com.team.s.sapp.inf.DialogNumberPickerListener;
 import com.team.s.sapp.model.Box;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class ChatFragment extends Fragment {
@@ -48,18 +50,18 @@ public class ChatFragment extends Fragment {
     TextView tvAge;
     @BindView(R.id.tv_from)
     TextView tvFrom;
-    @BindView(R.id.np_from)
-    NumberPicker npFrom;
     @BindView(R.id.tv_to)
     TextView tvTo;
-    @BindView(R.id.np_to)
-    NumberPicker npTo;
     @BindView(R.id.tv_category)
     TextView tvCategory;
-    @BindView(R.id.np_category)
-    NumberPicker npCategory;
     @BindView(R.id.group_view_call)
     Group groupViewCall;
+    @BindView(R.id.tv_from_age)
+    TextView tvFromAge;
+    @BindView(R.id.tv_to_age)
+    TextView tvToAge;
+    @BindView(R.id.tv_value_category)
+    TextView tvValueCategory;
 
     private ArrayList<Box> boxArrayList;
     BoxAdapter boxAdapter;
@@ -109,6 +111,40 @@ public class ChatFragment extends Fragment {
             tvHeader.setText("Tin nhắn");
             if (mainFragment != null)
                 mainFragment.setChangeIconFab(true);
+        }
+    }
+
+    //Event click fab button
+    @OnClick({R.id.tv_from_age,R.id.tv_to_age,R.id.tv_value_category})
+    public void onClickFabButton(View view) {
+
+        NumberPickerDialog numberPickerDialog = new NumberPickerDialog(getContext(), 1,80,null);
+
+        switch (view.getId()){
+
+            case R.id.tv_from_age:
+
+                numberPickerDialog.setDialogNumberPickerListener(new DialogNumberPickerListener() {
+                    @Override
+                    public void onClickYes(int value) {
+                        tvFromAge.setText(String.valueOf(value)+" tuổi");
+                    }
+                });
+                numberPickerDialog.show();
+                break;
+
+            case R.id.tv_to_age:
+                numberPickerDialog.setDialogNumberPickerListener(new DialogNumberPickerListener() {
+                    @Override
+                    public void onClickYes(int value) {
+                        tvFromAge.setText(String.valueOf(value)+" tuổi");
+                    }
+                });
+                numberPickerDialog.show();
+                break;
+
+            case R.id.tv_value_category:
+                break;
         }
     }
 
