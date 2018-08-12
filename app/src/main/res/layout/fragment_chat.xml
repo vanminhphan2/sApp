@@ -22,8 +22,155 @@
         android:id="@+id/rv_box"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_header" />
+
+    <TextView
+        android:id="@+id/tv_gender"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:text="Giới tính :"
+        android:textColor="@color/Blue"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_header" />
+
+    <TextView
+        android:id="@+id/tv_male"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nam"
+        android:textColor="@color/Black"
+        android:textSize="18sp"
+        android:layout_marginLeft="20dp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toRightOf="@id/tv_gender"
+        app:layout_constraintRight_toLeftOf="@id/cb_male"
+        app:layout_constraintTop_toTopOf="@id/tv_gender" />
+
+    <CheckBox
+        android:id="@+id/cb_male"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:layout_constraintRight_toLeftOf="@id/tv_female"
+        app:layout_constraintLeft_toRightOf="@id/tv_male"
+        app:layout_constraintTop_toTopOf="@id/tv_gender" />
+
+    <TextView
+        android:id="@+id/tv_female"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nữ"
+        android:layout_marginLeft="20dp"
+        android:textColor="@color/Red"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toRightOf="@id/cb_male"
+        app:layout_constraintRight_toLeftOf="@id/cb_female"
+        app:layout_constraintTop_toTopOf="@id/tv_gender" />
+
+    <CheckBox
+        android:id="@+id/cb_female"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        app:layout_constraintLeft_toRightOf="@id/tv_female"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_gender" />
+
+    <TextView
+        android:id="@+id/tv_age"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:text="Độ tuổi :"
+        android:textColor="@color/Blue"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_gender" />
+
+    <TextView
+        android:id="@+id/tv_from"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Từ"
+        android:textColor="@color/Black"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toRightOf="@id/tv_age"
+        app:layout_constraintRight_toLeftOf="@id/np_from"
+        app:layout_constraintTop_toTopOf="@id/tv_age" />
+
+    <NumberPicker
+        android:id="@+id/np_from"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        app:layout_constraintRight_toLeftOf="@id/tv_from"
+        app:layout_constraintLeft_toRightOf="@id/tv_to"
+        app:layout_constraintTop_toTopOf="@id/tv_age" />
+
+    <TextView
+        android:id="@+id/tv_to"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tới"
+        android:layout_marginLeft="20dp"
+        android:textColor="@color/Red"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toRightOf="@id/np_from"
+        app:layout_constraintRight_toLeftOf="@id/np_to"
+        app:layout_constraintTop_toTopOf="@id/tv_age" />
+
+    <NumberPicker
+        android:id="@+id/np_to"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="20dp"
+        app:layout_constraintLeft_toRightOf="@id/tv_to"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_age" />
+
+
+    <TextView
+        android:id="@+id/tv_category"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
+        android:text="Chủ đề :"
+        android:textColor="@color/Blue"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_age" />
+
+    <NumberPicker
+        android:id="@+id/np_category"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="20dp"
+        app:layout_constraintLeft_toRightOf="@id/tv_category"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_category" />
+
+    <android.support.constraint.Group
+        android:id="@+id/group_view_call"
+        app:constraint_referenced_ids="tv_gender,tv_male,cb_male,tv_female,cb_female, tv_age, tv_from, tv_to, np_from,np_to,tv_category,np_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
 </android.support.constraint.ConstraintLayout>

@@ -50,4 +50,14 @@ public class MainActivity extends AppCompatActivity {
 
         frameLogin.setVisibility(View.GONE);
     }
+
+    public boolean isLiveMainFragment(){
+        if(mainFragment!=null)
+            return true;
+        else return false;
+    }
+
+    public MainFragment getMainFragment() {
+        return mainFragment;
+    }
 }

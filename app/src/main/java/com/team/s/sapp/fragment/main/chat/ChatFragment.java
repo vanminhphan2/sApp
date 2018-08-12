@@ -3,17 +3,22 @@ package com.team.s.sapp.fragment.main.chat;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.Group;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 
 import com.daimajia.swipe.util.Attributes;
+import com.team.s.sapp.MainActivity;
 import com.team.s.sapp.R;
 import com.team.s.sapp.adapter.main.chat.BoxAdapter;
+import com.team.s.sapp.fragment.main.MainFragment;
 import com.team.s.sapp.model.Box;
 
 import java.util.ArrayList;
@@ -29,21 +34,49 @@ public class ChatFragment extends Fragment {
     Unbinder unbinder;
     @BindView(R.id.rv_box)
     RecyclerView rvBox;
+    @BindView(R.id.tv_gender)
+    TextView tvGender;
+    @BindView(R.id.tv_male)
+    TextView tvMale;
+    @BindView(R.id.cb_male)
+    CheckBox cbMale;
+    @BindView(R.id.tv_female)
+    TextView tvFemale;
+    @BindView(R.id.cb_female)
+    CheckBox cbFemale;
+    @BindView(R.id.tv_age)
+    TextView tvAge;
+    @BindView(R.id.tv_from)
+    TextView tvFrom;
+    @BindView(R.id.np_from)
+    NumberPicker npFrom;
+    @BindView(R.id.tv_to)
+    TextView tvTo;
+    @BindView(R.id.np_to)
+    NumberPicker npTo;
+    @BindView(R.id.tv_category)
+    TextView tvCategory;
+    @BindView(R.id.np_category)
+    NumberPicker npCategory;
+    @BindView(R.id.group_view_call)
+    Group groupViewCall;
 
     private ArrayList<Box> boxArrayList;
     BoxAdapter boxAdapter;
     LinearLayoutManager linearLayoutManager;
+    MainFragment mainFragment;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
         unbinder = ButterKnife.bind(this, view);
-
+        if (MainActivity.mainActivity.isLiveMainFragment())
+            mainFragment = MainActivity.mainActivity.getMainFragment();
         //temp
-        boxArrayList= new ArrayList<>();
+        boxArrayList = new ArrayList<>();
 
-        for (int i=0; i<15;i++){
+        for (int i = 0; i < 15; i++) {
             boxArrayList.add(new Box());
         }
         initRecyclerView(boxArrayList);
@@ -58,6 +91,25 @@ public class ChatFragment extends Fragment {
         boxAdapter.setMode(Attributes.Mode.Single);
         rvBox.setLayoutManager(linearLayoutManager);
         rvBox.setAdapter(boxAdapter);
+    }
+
+    //Change view layout message to call or in contrast
+    //Đổi view tin nhắn sang gọi điện hoặc ngược lại
+    public void setChangeLayout() {
+
+        if (rvBox.getVisibility() == View.VISIBLE) {
+            rvBox.setVisibility(View.GONE);
+            groupViewCall.setVisibility(View.VISIBLE);
+            tvHeader.setText("Gọi cho người lạ");
+            if (mainFragment != null)
+                mainFragment.setChangeIconFab(false);
+        } else {
+            rvBox.setVisibility(View.VISIBLE);
+            groupViewCall.setVisibility(View.GONE);
+            tvHeader.setText("Tin nhắn");
+            if (mainFragment != null)
+                mainFragment.setChangeIconFab(true);
+        }
     }
 
     @Override
