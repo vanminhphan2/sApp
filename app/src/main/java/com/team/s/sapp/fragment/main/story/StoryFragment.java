@@ -38,8 +38,7 @@ public class StoryFragment extends Fragment {
     @BindView(R.id.img_change_story)    ImageView change;
     @BindView(R.id.fab_menu_story)      FloatingActionButton fab_menu;
     @BindView(R.id.fab_create_story)    FloatingActionButton fab_create;
-    @BindView(R.id.layout_menu_story)   LinearLayout layout;
-    @BindView(R.id.layout)              RelativeLayout room_layout;
+    @BindView(R.id.layout)              ConstraintLayout room_layout;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -81,33 +80,31 @@ public class StoryFragment extends Fragment {
     @SuppressLint("RestrictedApi")
     private void ShowView(){
         //animated fab
-        TranslateAnimation animation = new TranslateAnimation(0, -592,0,0);
-        animation.setDuration(1000);
-        animation.setFillAfter(false);
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.out_left);
+        //animation.setDuration(1000);
+        //animation.setFillAfter(false);
         fab_menu.startAnimation(animation);
         fab_menu.setVisibility(View.INVISIBLE);
 
         //show menu
-        final Animation animation1 = AnimationUtils.loadAnimation(getContext(), R.anim.out_left);
-        layout.startAnimation(animation1);
-        layout.setVisibility(View.VISIBLE);
+        Animation animation1 = AnimationUtils.loadAnimation(getContext(), R.anim.in_right);
+        room_layout.startAnimation(animation1);
+        room_layout.setVisibility(View.VISIBLE);
     }
 
     //hide animation menu
     @SuppressLint("RestrictedApi")
     private void HideView(){
 
-        //hide layout menu
-        final Animation animation1 = AnimationUtils.loadAnimation(getContext(), R.anim.in_right);
-        layout.startAnimation(animation1);
-        layout.setVisibility(View.GONE);
-
         //show and animated fab menu
-        TranslateAnimation animation = new TranslateAnimation(-592, 0,0,0);
-        animation.setDuration(1000);
-        animation.setFillAfter(false);
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.in_right);
         fab_menu.startAnimation(animation);
         fab_menu.setVisibility(View.VISIBLE);
+        //hide layout menu
+        final Animation animation1 = AnimationUtils.loadAnimation(getContext(), R.anim.out_left);
+        room_layout.startAnimation(animation1);
+        room_layout.setVisibility(View.GONE);
+
 
     }
 }
