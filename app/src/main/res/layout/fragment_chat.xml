@@ -11,6 +11,7 @@
         android:background="@drawable/bg_header"
         android:text="Tin nhắn"
         android:textAlignment="center"
+        android:gravity="center"
         android:textColor="@color/OrangeRed"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -46,10 +47,10 @@
         android:id="@+id/tv_male"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
         android:text="Nam"
         android:textColor="@color/Black"
         android:textSize="18sp"
-        android:layout_marginLeft="20dp"
         android:textStyle="bold"
         app:layout_constraintLeft_toRightOf="@id/tv_gender"
         app:layout_constraintRight_toLeftOf="@id/cb_male"
@@ -59,16 +60,16 @@
         android:id="@+id/cb_male"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        app:layout_constraintRight_toLeftOf="@id/tv_female"
         app:layout_constraintLeft_toRightOf="@id/tv_male"
+        app:layout_constraintRight_toLeftOf="@id/tv_female"
         app:layout_constraintTop_toTopOf="@id/tv_gender" />
 
     <TextView
         android:id="@+id/tv_female"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nữ"
         android:layout_marginLeft="20dp"
+        android:text="Nữ"
         android:textColor="@color/Red"
         android:textSize="18sp"
         android:textStyle="bold"
@@ -107,35 +108,45 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintLeft_toRightOf="@id/tv_age"
-        app:layout_constraintRight_toLeftOf="@id/np_from"
+        app:layout_constraintRight_toLeftOf="@id/tv_from_age"
         app:layout_constraintTop_toTopOf="@id/tv_age" />
 
-    <NumberPicker
-        android:id="@+id/np_from"
+    <TextView
+        android:id="@+id/tv_from_age"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        app:layout_constraintRight_toLeftOf="@id/tv_from"
+        android:gravity="center"
+        android:text="18 tuổi"
+        android:textAlignment="center"
+        android:textColor="@color/Violet"
+        android:textStyle="bold"
         app:layout_constraintLeft_toRightOf="@id/tv_to"
+        app:layout_constraintRight_toLeftOf="@id/tv_from"
         app:layout_constraintTop_toTopOf="@id/tv_age" />
 
     <TextView
         android:id="@+id/tv_to"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tới"
         android:layout_marginLeft="20dp"
+        android:text="đến"
         android:textColor="@color/Red"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintLeft_toRightOf="@id/np_from"
-        app:layout_constraintRight_toLeftOf="@id/np_to"
+        app:layout_constraintLeft_toRightOf="@id/tv_from_age"
+        app:layout_constraintRight_toLeftOf="@id/tv_to_age"
         app:layout_constraintTop_toTopOf="@id/tv_age" />
 
-    <NumberPicker
-        android:id="@+id/np_to"
+    <TextView
+        android:id="@+id/tv_to_age"
         android:layout_width="0dp"
         android:layout_height="30dp"
         android:layout_marginLeft="10dp"
+        android:gravity="center"
+        android:text="25 tuổi"
+        android:textAlignment="center"
+        android:textColor="@color/Violet"
+        android:textStyle="bold"
         android:layout_marginRight="20dp"
         app:layout_constraintLeft_toRightOf="@id/tv_to"
         app:layout_constraintRight_toRightOf="parent"
@@ -156,21 +167,38 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_age" />
 
-    <NumberPicker
-        android:id="@+id/np_category"
+    <TextView
+        android:id="@+id/tv_value_category"
         android:layout_width="0dp"
         android:layout_height="30dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="20dp"
+        android:gravity="center"
+        android:text="Tình yêu"
+        android:textAlignment="center"
+        android:textColor="@color/Violet"
+        android:textStyle="bold"
         app:layout_constraintLeft_toRightOf="@id/tv_category"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="@id/tv_category" />
 
     <android.support.constraint.Group
         android:id="@+id/group_view_call"
-        app:constraint_referenced_ids="tv_gender,tv_male,cb_male,tv_female,cb_female, tv_age, tv_from, tv_to, np_from,np_to,tv_category,np_category"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        app:constraint_referenced_ids="tv_gender,tv_male,cb_male,tv_female,cb_female, tv_age, tv_from, tv_to_age,tv_from_age,tv_to,tv_category,tv_value_category" />
+
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/fab_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:scaleType="centerInside"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/ic_call_pink"
+        android:backgroundTint="@color/CornflowerBlue"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

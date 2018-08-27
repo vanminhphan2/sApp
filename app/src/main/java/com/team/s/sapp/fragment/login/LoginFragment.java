@@ -11,15 +11,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.team.s.sapp.MainActivity;
 import com.team.s.sapp.R;
-import com.team.s.sapp.fragment.main.MainFragment;
+import com.team.s.sapp.dialog.LoadingDialog;
 
 import java.util.concurrent.TimeUnit;
 
@@ -54,15 +59,20 @@ public class LoginFragment extends Fragment {
     @BindView(R.id.groupViewConfirmCode)
     Group groupViewConfirmCode;
     Unbinder unbinder;
-
+    LoadingDialog loadingDialog;
+    private FirebaseAuth auth;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks verificationcallback;
     private PhoneAuthProvider.ForceResendingToken resendingToken;
+    private String verifyCode;
+    private String phoneRegister;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
         unbinder = ButterKnife.bind(this, view);
+        auth = FirebaseAuth.getInstance();
+        loadingDialog=new LoadingDialog(getContext());
         return view;
     }
 
@@ -72,8 +82,11 @@ public class LoginFragment extends Fragment {
 
             case R.id.btnLogin:
 
-                MainActivity.mainActivity.replaceMainFragment();
-                MainActivity.mainActivity.goneLoginFragment();
+//                MainActivity.mainActivity.replaceMainFragment();
+//                MainActivity.mainActivity.replaceEditProfileFragment();
+                MainActivity.mainActivity.loadingDialog.show();
+                MainActivity.mainActivity.login(edtPhone.getText().toString(),edtPass.getText().toString());
+
                 break;
 
             case R.id.btnRegister:
@@ -82,21 +95,21 @@ public class LoginFragment extends Fragment {
                 break;
 
             case R.id.btnGetCode:
+                phoneRegister=edtPhoneRegister.getText().toString();
+                loadingDialog.show();
                 getCode();
-                groupViewGetCode.setVisibility(View.GONE);
-                groupViewConfirmCode.setVisibility(View.VISIBLE);
                 break;
 
             case R.id.btnConfirm:
-                groupViewConfirmCode.setVisibility(View.GONE);
-                groupViewLogin.setVisibility(View.VISIBLE);
+                loadingDialog.show();
+                verifyCode();
                 break;
         }
     }
 
     public void getCode() {
+        phoneRegister=edtPhoneRegister.getText().toString();
         String phone_number = "+84"+edtPhoneRegister.getText().toString();
-
         setupVerificationCallback();
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 phone_number,        // Phone number to verify
@@ -112,6 +125,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onVerificationCompleted(PhoneAuthCredential phoneAuthCredential) {
                 //time out
+                Log.e(TAG,"get code FireBase: time out");
             }
 
             @Override
@@ -119,24 +133,67 @@ public class LoginFragment extends Fragment {
 
                 if (e instanceof FirebaseAuthInvalidCredentialsException)
                 {
-                    Log.d(TAG,"Invalid Credential: " + e.getLocalizedMessage());
+                    Log.e(TAG,"Invalid Credential: " + e.getLocalizedMessage());
                 }
                 else if (e instanceof FirebaseTooManyRequestsException)
                 {
-                    Log.d(TAG,"SMS exceeded: " + e);
+                    Log.e(TAG,"SMS exceeded: " + e);
                 }
             }
 
             @Override
             public void onCodeSent(String s, PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                 resendingToken = forceResendingToken;
+                verifyCode=s;
+                loadingDialog.hide();
+                groupViewGetCode.setVisibility(View.GONE);
+                groupViewConfirmCode.setVisibility(View.VISIBLE);
             }
         };
     }
+
+    public void verifyCode()
+    {
+        String code = edtCode.getText().toString();
+        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verifyCode, code);
+        signInWithPhoneAuthCredential(credential);
+    }
+
+    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
+        auth.signInWithCredential(credential)
+                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+
+                        if (task.isSuccessful())
+                        {
+                            Log.e(TAG, "signInWithCredential:success");
+                            Toast.makeText(getContext(), "Xác nhận thành công!", Toast.LENGTH_SHORT).show();
+                            loadingDialog.hide();
+                            groupViewConfirmCode.setVisibility(View.GONE);
+                            groupViewLogin.setVisibility(View.VISIBLE);
+                            MainActivity.mainActivity.registerPhoneOnFB(phoneRegister);
+
+                        }
+                        else {
+                            Log.e(TAG, "signInWithCredential:failure", task.getException());
+                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+
+                            }
+                        }
+                    }
+                });
+    }
+
+
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    public void loginFail() {
+        Toast.makeText(getContext(), "Sai tài khoảng hoặc mật khẩu!", Toast.LENGTH_SHORT).show();
     }
 }

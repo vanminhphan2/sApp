@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true">
+
+    <TextView
+        android:id="@+id/tv_header"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:background="@drawable/bg_header"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_user_name"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp"
+        android:gravity="center|left"
+        android:textColor="@color/Red"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toRightOf="@id/img_user"
+        app:layout_constraintRight_toLeftOf="@id/img_call"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/img_user"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp"
+        android:padding="3dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintLeft_toRightOf="@id/img_back"
+        app:layout_constraintRight_toLeftOf="@id/tv_user_name"
+        app:riv_corner_radius="10dip" />
+
+    <ImageView
+        android:id="@+id/img_back"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="10dp"
+        android:src="@drawable/ic_back_black"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/img_user"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/img_call"
+        android:layout_width="40dp"
+        android:layout_height="0dp"
+        android:padding="7dp"
+        android:src="@drawable/ic_call_pink"
+        app:layout_constraintBottom_toBottomOf="@id/tv_header"
+        app:layout_constraintLeft_toRightOf="@id/tv_user_name"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_chat"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/edt_input"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_header" />
+
+    <EditText
+        android:id="@+id/edt_input"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:gravity="center|left"
+        android:padding="3dp"
+        android:background="@color/White"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/img_send_image"
+        app:layout_constraintRight_toLeftOf="@id/tv_send_mess" />
+
+    <ImageView
+        android:id="@+id/img_send_image"
+        android:layout_width="40dp"
+        android:background="@color/White"
+        android:layout_height="0dp"
+        android:padding="5dp"
+        android:src="@drawable/ic_add_img"
+        app:layout_constraintBottom_toBottomOf="@id/edt_input"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/edt_input"
+        app:layout_constraintTop_toTopOf="@id/edt_input" />
+
+    <TextView
+        android:id="@+id/tv_send_mess"
+        android:layout_width="50dp"
+        android:layout_height="0dp"
+        android:background="@color/White"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="Gửi"
+        android:textColor="@color/Red"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/edt_input"
+        app:layout_constraintLeft_toRightOf="@id/edt_input"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/edt_input" />
+</android.support.constraint.ConstraintLayout>

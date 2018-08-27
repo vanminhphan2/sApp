@@ -33,6 +33,7 @@
         android:layout_height="50dp"
         android:hint="Password"
         android:singleLine="true"
+        android:inputType="textPassword"
         android:textColorHint="#220169"
         android:textStyle="bold"
         app:layout_constraintDimensionRatio="W, 4:1"

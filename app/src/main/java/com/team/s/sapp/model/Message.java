@@ -2,28 +2,23 @@ package com.team.s.sapp.model;
 
 public class Message {
 
-    private String idUser;
     private String idMess;
-    private String text;
-    private String image;
+    private String idSender;
+    private String messText;
+    private String messImage;
     private Float ratioImage;
     private String timeSend;
 
-    public Message(String idUser, String idMess, String text, String image, Float ratioImage, String timeSend) {
-        this.idUser = idUser;
+    public Message() {
+    }
+
+    public Message(String idMess, String idSender, String messText, String messImage, Float ratioImage, String timeSend) {
         this.idMess = idMess;
-        this.text = text;
-        this.image = image;
+        this.idSender = idSender;
+        this.messText = messText;
+        this.messImage = messImage;
         this.ratioImage = ratioImage;
         this.timeSend = timeSend;
-    }
-
-    public String getIdUser() {
-        return idUser;
-    }
-
-    public void setIdUser(String idUser) {
-        this.idUser = idUser;
     }
 
     public String getIdMess() {
@@ -34,20 +29,28 @@ public class Message {
         this.idMess = idMess;
     }
 
-    public String getText() {
-        return text;
+    public String getIdSender() {
+        return idSender;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setIdSender(String idSender) {
+        this.idSender = idSender;
     }
 
-    public String getImage() {
-        return image;
+    public String getMessText() {
+        return messText;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setMessText(String messText) {
+        this.messText = messText;
+    }
+
+    public String getMessImage() {
+        return messImage;
+    }
+
+    public void setMessImage(String messImage) {
+        this.messImage = messImage;
     }
 
     public Float getRatioImage() {

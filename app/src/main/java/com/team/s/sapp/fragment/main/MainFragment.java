@@ -11,10 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.melnykov.fab.FloatingActionButton;
+import com.team.s.sapp.MainActivity;
 import com.team.s.sapp.R;
 import com.team.s.sapp.adapter.main.MainViewPagerAdapter;
+import com.team.s.sapp.fragment.account.EditProfileFragment;
 import com.team.s.sapp.fragment.main.chat.ChatFragment;
 import com.team.s.sapp.fragment.main.story.StoryFragment;
+import com.team.s.sapp.model.Profile;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,21 +33,40 @@ public class MainFragment extends Fragment {
     Unbinder unbinder;
 
     MainViewPagerAdapter mainViewPagerAdapter;
-    @BindView(R.id.fab_button)
-    FloatingActionButton fabButton;
     StoryFragment storyFragment;
     ChatFragment chatFragment;
     MainFragment mainFragment;
+
+    public Profile user;
+
+    public static MainFragment newInstance(Profile profile) {
+        MainFragment mainFragment = new MainFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("USER_PROFILE", profile);
+        mainFragment.setArguments(args);
+        return mainFragment;
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         unbinder = ButterKnife.bind(this, view);
+        if(getArguments()!=null){
+            user= (Profile) getArguments().getSerializable("USER_PROFILE");
+        }
         setupViewPager();
         tabMain.setupWithViewPager(vpMain);
         mainFragment=this;
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if(MainActivity.mainActivity.loadingDialog!=null)
+            if (MainActivity.mainActivity.loadingDialog.isShowing())
+                MainActivity.mainActivity.loadingDialog.hide();
     }
 
     private void setupViewPager() {
@@ -55,28 +77,6 @@ public class MainFragment extends Fragment {
         mainViewPagerAdapter.addFragment(storyFragment, "Story");
         mainViewPagerAdapter.addFragment(chatFragment, "Chat");
         vpMain.setAdapter(mainViewPagerAdapter);
-    }
-
-    //Event click fab button
-    @OnClick(R.id.fab_button)
-    public void onClickFabButton() {
-
-        if (vpMain.getCurrentItem() == 0) {//If current pager is story fragment
-            //do something
-        } else if (vpMain.getCurrentItem() == 1) {//If current pager is chat fragment
-            if (chatFragment != null) {
-                chatFragment.setChangeLayout();
-            }
-        } else return;
-    }
-
-    public void setChangeIconFab(boolean bl){
-
-        if (bl){
-            fabButton.setImageResource(R.drawable.ic_call_pink);
-        }else {
-            fabButton.setImageResource(R.drawable.ic_msg_green);
-        }
     }
 
     @Override
