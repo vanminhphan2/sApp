@@ -1,14 +1,20 @@
 package com.team.s.sapp.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Box implements Serializable {
 
+    @SerializedName("idSender")
     private String idSender;
+    @SerializedName("idRecipient")
     private String idRecipient;
+    @SerializedName("idBox")
     private String idBox;
     private ArrayList<Message> messages;
+    private int toDayIsMonday;
 
     public Box() {
     }
@@ -50,5 +56,14 @@ public class Box implements Serializable {
 
     public void setMessages(ArrayList<Message> messages) {
         this.messages = messages;
+    }
+
+    @Override
+    public String toString() {
+        return "Box{" +
+                "idSender='" + idSender + '\'' +
+                ", idRecipient='" + idRecipient + '\'' +
+                ", idBox='" + idBox + '\'' +
+                '}';
     }
 }

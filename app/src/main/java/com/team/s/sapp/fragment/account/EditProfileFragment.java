@@ -1,11 +1,14 @@
 package com.team.s.sapp.fragment.account;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.InputType;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,18 +20,33 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.team.s.sapp.MainActivity;
 import com.team.s.sapp.R;
+import com.team.s.sapp.api.ApiClient;
+import com.team.s.sapp.api.RegisterApi;
 import com.team.s.sapp.dialog.NumberPickerDialog;
 import com.team.s.sapp.inf.DialogNumberPickerListener;
 import com.team.s.sapp.inf.MyOnClickItem;
 import com.team.s.sapp.model.Profile;
+import com.team.s.sapp.model.Result;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.text.InputType.TYPE_CLASS_TEXT;
 
@@ -111,9 +129,10 @@ public class EditProfileFragment extends Fragment {
                                 Glide.with(getContext())
                                         .load(pathImg)
                                         .into(imgUserEdit);
-                                if(profile==null)
-                                    profile=new Profile();
+                                if (profile == null)
+                                    profile = new Profile();
                                 profile.setImgUser(pathImg);
+                                profile.setRatioImage(0f);
                             }
                         }
                     }
@@ -126,6 +145,7 @@ public class EditProfileFragment extends Fragment {
                 numberPickerDialog.setDialogNumberPickerListener(new DialogNumberPickerListener() {
                     @Override
                     public void onClickYes(int value) {
+                        Log.e("Rio year birt", String.valueOf(value)+"");
                         birthYear.setText(String.valueOf(value));
                     }
                 });
@@ -148,7 +168,11 @@ public class EditProfileFragment extends Fragment {
                     if (profile == null)
                         profile = new Profile();
                     setUserProfile();
-                    MainActivity.mainActivity.createOrEditUserProfile(profile);
+                    uploadImageToFireBase(profile);
+//                    MainActivity.mainActivity.createUserProfile(profile);
+                }
+                else {
+                    MainActivity.mainActivity.loadingDialog.hide();
                 }
                 break;
         }
@@ -173,13 +197,17 @@ public class EditProfileFragment extends Fragment {
     private void setUserProfile() {
 
         profile.setInfo(true);
+        profile.setYearOfBirth(Integer.parseInt(birthYear.getText().toString()));
         profile.setUserName(edtUserName.getText().toString());
         if (cbFemale.isChecked())
             profile.setGender(0);
         else profile.setGender(1);
-        profile.setPassword(edtPassword.getText().toString());
         if (phoneRegister != null && !phoneRegister.equals("")) {
             profile.setPhone(phoneRegister);
+        }
+        if(profile.getImgUser()==null){
+            profile.setImgUser("");
+            profile.setRatioImage(0f);
         }
     }
 
@@ -203,6 +231,102 @@ public class EditProfileFragment extends Fragment {
         }
         return true;
     }
+
+    //create and insert user to server database(SD)
+    private void insertUserToSD(final Profile profile) {
+        Log.e("Rio profile",profile.toString());
+        String phone = profile.getPhone().trim();
+        String password =edtPassword.getText().toString().trim();
+        String userName = profile.getUserName().trim();
+        String yearOfBirth = String.valueOf(profile.getYearOfBirth()).trim();
+        String imgUser = profile.getImgUser().trim();
+        String gender = String.valueOf(profile.getGender()).trim();
+        String ratioImage = String.valueOf(profile.getRatioImage()).trim();
+
+        RegisterApi apiClient = ApiClient.getClient().create(RegisterApi.class);
+
+        Call<Result> call = apiClient.register(phone,
+                password, userName,
+                yearOfBirth, imgUser,
+                gender, ratioImage, "1");
+        call.enqueue(new Callback<Result>() {
+            @Override
+            public void onResponse(Call<Result> call, Response<Result> response) {
+
+                Log.e("Rio result createUser", response.body().getStatus().toString());
+                Log.e("Rio result createUser", response.body().getUserById().toString());
+                if (response.body().getStatus().equals("success")) {
+                    MainActivity.mainActivity.loadingDialog.hide();
+                    Toast.makeText(getContext(), "createUser thanh cong", Toast.LENGTH_SHORT).show();
+                    Gson gson = new Gson(); // Or use new GsonBuilder().create();
+                    Profile user = response.body().getUserById();
+                    MainActivity.mainActivity.finishRegister(user);
+                } else {
+                    MainActivity.mainActivity.loadingDialog.hide();
+                    Toast.makeText(getContext(), "createUser FAIL", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<Result> call, Throwable t) {
+                Log.e("Rio DK user", t.toString());
+
+                Toast.makeText(getContext(), "lỗi kết nối server!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void uploadImageToFireBase(final Profile profile) {
+        final String[] linkImage = {""};
+        String pathImg=profile.getImgUser();
+        if(!pathImg.equals("")){
+        Bitmap bitmapImg = null;
+        Float ratioImg = 0f;
+        try {
+            bitmapImg = MainActivity.mainActivity.modifyOrientation(MainActivity.mainActivity.readBitmapAndScale(pathImg), pathImg);
+            Float a = Float.valueOf(bitmapImg.getHeight());
+            Float b = Float.valueOf(bitmapImg.getWidth());
+            ratioImg = a / b;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmapImg.compress(Bitmap.CompressFormat.PNG, 10, baos);
+        byte[] data = baos.toByteArray();
+
+        String nameImg = MainActivity.mainActivity.getDateNow() + ".png";
+        UploadTask uploadTask;
+        final StorageReference ref = MainActivity.mainActivity.storageRef.child("ImageUser").child(nameImg);
+        uploadTask = ref.putBytes(data);
+        profile.setRatioImage(ratioImg);
+
+        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+//                    Toast.makeText(getContext(), "failll!!", Toast.LENGTH_SHORT).show();
+                return ref.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    linkImage[0] =String.valueOf(task.getResult());
+                    profile.setImgUser(linkImage[0]);
+                    insertUserToSD(profile);
+                    return;
+                } else {
+                    // Handle failures
+                    // ...
+                }
+            }
+        });
+        }
+    }
+
 
     @Override
     public void onDestroyView() {

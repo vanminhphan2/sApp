@@ -88,10 +88,10 @@ public class MainActivity extends AppCompatActivity {
     public static MainActivity mainActivity;
 
     private FirebaseDatabase firebaseDatabase;
-    private   DatabaseReference userRef;
-    private   DatabaseReference boxRef;
-    private  StorageReference storageRef;
-    private  FirebaseStorage storage;
+    private DatabaseReference userRef;
+    private DatabaseReference boxRef;
+    public StorageReference storageRef;
+    private FirebaseStorage storage;
 
     public Profile user;
     private ArrayList<Box> listBoxFireBase;
@@ -115,17 +115,28 @@ public class MainActivity extends AppCompatActivity {
         storageRef = storage.getReference();
         userRef = firebaseDatabase.getReference("Users");
         boxRef = firebaseDatabase.getReference("Boxs");
-        loadingDialog=new LoadingDialog(this);
+        loadingDialog = new LoadingDialog(this);
         replaceLoginFragment();
 //        replaceChatFragment();
 
     }
 
+    public void showDialog() {
+        if (loadingDialog != null && !loadingDialog.isShowing()) {
+            loadingDialog.show();
+        }
+    }
 
-    public void onClickImg(View v, String linkImg){
+    public void hideDialog() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.hide();
+        }
+    }
+
+    public void onClickImg(View v, String linkImg) {
 
         Intent intent = new Intent(MainActivity.this, ImageViewerActivity.class);
-        intent.putExtra("LINK_IMAGE",linkImg);
+        intent.putExtra("LINK_IMAGE", linkImg);
         ActivityOptionsCompat options = ActivityOptionsCompat
                 .makeSceneTransitionAnimation(MainActivity.this,
                         v, "image");
@@ -176,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
                 .replace(R.id.frame_edit_profile, editProfileFragment)
                 .commitAllowingStateLoss();
     }
+
     public void removeMainFragment() {
 
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.frame_main);
@@ -246,13 +258,13 @@ public class MainActivity extends AppCompatActivity {
         removeLoginFragment();
     }
 
-    public void createOrEditUserProfile(Profile profile) {
+    public void finishRegister(Profile profile) {
 
-        String idUser = getRandomString(5);
-        profile.setId(idUser);
+//        String idUser = getRandomString(5);
+//        profile.setId(idUser);
         user = profile;
-        uploadImageToFireBase(profile.getImgUser(),idUser);
-        userRef.child(idUser).setValue(profile);
+//        uploadImageToFireBase(profile.getImgUser(),idUser);
+//        userRef.child(idUser).setValue(profile);
         replaceMainFragment(user);
         removeEditProfileFragment();
     }
@@ -334,14 +346,14 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
 //                userLogin[0] = new Profile();
-                String strPhone="" ,strPass="";
+                String strPhone = "", strPass = "";
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     strPhone = postSnapshot.child("phone").getValue(String.class);
                     strPass = postSnapshot.child("password").getValue(String.class);
-                    if(phone.equals(strPhone)&&pass.equals(strPass))
+                    if (phone.equals(strPhone) && pass.equals(strPass))
                         user = postSnapshot.getValue(Profile.class);
                 }
-                if (user!=null)
+                if (user != null)
                     loginSuccess();
                 else loginFail();
 
@@ -354,12 +366,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void loginSuccess(){
+    private void loginSuccess() {
         replaceMainFragment(user);
         removeLoginFragment();
         Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
     }
-    private void loginFail(){
+
+    private void loginFail() {
 
         LoginFragment fragment = (LoginFragment) getSupportFragmentManager().findFragmentById(R.id.frame_login);
         if (fragment != null && fragment instanceof LoginFragment) {
@@ -479,7 +492,7 @@ public class MainActivity extends AppCompatActivity {
 
     public Bitmap readBitmapAndScale(String path) {
         BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true; //Chỉ đọc thông tin ảnh, không đọc dữ liwwuj
+        options.inJustDecodeBounds = true; //Chỉ đọc thông tin ảnh, không đọc dữ liệu
         BitmapFactory.decodeFile(path, options); //Đọc thông tin ảnh
         options.inSampleSize = 2; //Scale bitmap xuống 2 lần
         options.inJustDecodeBounds = false; //Cho phép đọc dữ liệu ảnh ảnh
@@ -493,27 +506,11 @@ public class MainActivity extends AppCompatActivity {
         return formattedDate;
     }
 
-    public void showImageTranslation(RoundedImageView view){
-// Check that the device is running lollipop
+    public void showImageTranslation(RoundedImageView view) {
+        // Check that the device is running lollipop
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             FragmentManager fragmentManager = getSupportFragmentManager();
-//            ChatBoxFragment mainFragment = (ChatBoxFragment) fragmentManager
-//                    .findFragmentById(R.id.frame_chat);
-//            mainFragment.setExitTransition(new Fade().setDuration(200));//time hide fragment Bottom
             PreviewImageFragment articleFragment = new PreviewImageFragment();
-//            TransitionSet transitionSet = new TransitionSet();
-//            transitionSet.addTransition(new ChangeBounds());
-////            transitionSet.addTransition(new ChangeImageTransform());
-//            transitionSet.addTransition(new ChangeTransform());
-////            transitionSet.addTransition(new ChangeClipBounds());
-////            transitionSet.setPathMotion(new ArcMotion());
-//            articleFragment.setSharedElementEnterTransition(
-//                    transitionSet);
-//            articleFragment.setSharedElementReturnTransition(
-//                    transitionSet);
-//            articleFragment.setSharedElementEnterTransition(TransitionInflater.from(mainFragment.getActivity()).inflateTransition(R.transition.change_image_transform));
-//            articleFragment.setEnterTransition(TransitionInflater.from(mainFragment.getActivity()).inflateTransition(R.transition.change_image_transform));
-
             view.setTransitionName("ABCDEF");
             fragmentManager.beginTransaction()
                     .addSharedElement(view, ViewCompat.getTransitionName(view))
@@ -521,17 +518,9 @@ public class MainActivity extends AppCompatActivity {
                     .addToBackStack("TAG")
                     .setReorderingAllowed(true) // Need for transition element
                     .commit();
-        }
-        else {
+        } else {
             // Code to run on older devices
         }
     }
-
-//    public void showPreviewImage(){
-//        getSupportFragmentManager()
-//                .beginTransaction()
-//                .add(R.id.frame_chat, ChatBoxFragment.newInstance())
-//                .commit();
-//    }
 
 }

@@ -1,27 +1,36 @@
 package com.team.s.sapp.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 public class Profile implements Serializable {
 
-    private String id;
+    @SerializedName("userId")
+    private int id;
+    @SerializedName("userName")
     private String userName;
+    @SerializedName("yearOfBirth")
     private int yearOfBirth;
+    @SerializedName("imageUser")
     private String imgUser;
+    @SerializedName("gender")
     private int gender;
-    private String password;
+    @SerializedName("info")
     private boolean info;
+    @SerializedName("phone")
     private String phone;
+    @SerializedName("ratioImage")
     private Float ratioImage;
 
     public Profile() {
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -57,14 +66,6 @@ public class Profile implements Serializable {
         this.gender = gender;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public boolean isInfo() {
         return info;
     }
@@ -87,5 +88,19 @@ public class Profile implements Serializable {
 
     public void setRatioImage(Float ratioImage) {
         this.ratioImage = ratioImage;
+    }
+
+    @Override
+    public String toString() {
+        return "Profile{" +
+                "id='" + id + '\'' +
+                ", userName='" + userName + '\'' +
+                ", yearOfBirth=" + yearOfBirth +
+                ", imgUser='" + imgUser + '\'' +
+                ", gender=" + gender +
+                ", info=" + info +
+                ", phone='" + phone + '\'' +
+                ", ratioImage=" + ratioImage +
+                '}';
     }
 }
