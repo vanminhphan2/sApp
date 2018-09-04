@@ -1,6 +1,7 @@
 package com.team.s.sapp;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -11,6 +12,7 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
@@ -18,17 +20,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.transition.ArcMotion;
-import android.transition.ChangeBounds;
-import android.transition.ChangeClipBounds;
-import android.transition.ChangeImageTransform;
-import android.transition.ChangeTransform;
-import android.transition.Fade;
-import android.transition.TransitionInflater;
-import android.transition.TransitionSet;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
@@ -53,10 +46,13 @@ import com.team.s.sapp.fragment.main.MainFragment;
 import com.team.s.sapp.fragment.main.chat.ChatBoxFragment;
 import com.team.s.sapp.fragment.utility.GalleryFragment;
 import com.team.s.sapp.fragment.utility.PreviewImageFragment;
+import com.team.s.sapp.inf.MyCallBackLayout;
 import com.team.s.sapp.inf.MyOnClickItem;
 import com.team.s.sapp.model.Box;
 import com.team.s.sapp.model.Message;
 import com.team.s.sapp.model.Profile;
+import com.team.s.sapp.util.AnimateUtils;
+import com.team.s.sapp.util.Constants;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -71,8 +67,6 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity {
 
     static public int WIDTHDEVICE = 0;
-    private static final String ALLOWED_CHARACTERS = "0123456789qwertyuiopasdfghjklzxcvbnm";
-    private static final int PERMISION_READ_EXTERNAL_STORAGE = 1;
 
     @BindView(R.id.frame_main)
     FrameLayout frameMain;
@@ -100,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
     private MyOnClickItem onClickChooseImg;
     public LoadingDialog loadingDialog;
 
+
+    final public Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,13 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void replaceLoginFragment() {
 
-        loginFragment = new LoginFragment();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame_login, loginFragment)
-                .commitAllowingStateLoss();
-    }
 
     private void replaceChatFragment() {
 
@@ -280,7 +270,7 @@ public class MainActivity extends AppCompatActivity {
         final Random random = new Random();
         final StringBuilder sb = new StringBuilder(sizeOfRandomString);
         for (int i = 0; i < sizeOfRandomString; ++i)
-            sb.append(ALLOWED_CHARACTERS.charAt(random.nextInt(ALLOWED_CHARACTERS.length())));
+            sb.append(Constants.ALLOWED_CHARACTERS.charAt(random.nextInt(Constants.ALLOWED_CHARACTERS.length())));
         return sb.toString();
     }
 
@@ -337,62 +327,17 @@ public class MainActivity extends AppCompatActivity {
                 if (shouldShowRequestPermissionRationale(
                         Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 }
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISION_READ_EXTERNAL_STORAGE);
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, Constants.PERMISION_READ_EXTERNAL_STORAGE);
 
             }
         }
-    }
-
-    public void login(final String phone, final String pass) {
-
-//        final Profile[] profile = {new Profile()};
-//        final Profile[] userLogin = new Profile[1];
-        userRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-//                userLogin[0] = new Profile();
-                String strPhone = "", strPass = "";
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    strPhone = postSnapshot.child("phone").getValue(String.class);
-                    strPass = postSnapshot.child("password").getValue(String.class);
-                    if (phone.equals(strPhone) && pass.equals(strPass))
-                        user = postSnapshot.getValue(Profile.class);
-                }
-                if (user != null)
-                    loginSuccess();
-                else loginFail();
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void loginSuccess() {
-        replaceMainFragment(user);
-        removeLoginFragment();
-        Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-    }
-
-    private void loginFail() {
-
-        LoginFragment fragment = (LoginFragment) getSupportFragmentManager().findFragmentById(R.id.frame_login);
-        if (fragment != null && fragment instanceof LoginFragment) {
-            fragment.loginFail();
-        }
-        if (loadingDialog.isShowing())
-            loadingDialog.hide();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case PERMISION_READ_EXTERNAL_STORAGE: {
+            case Constants.PERMISION_READ_EXTERNAL_STORAGE: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -527,6 +472,54 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // Code to run on older devices
         }
+    }
+
+    private void replaceLoginFragment() {
+
+        loginFragment = new LoginFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.frame_login, loginFragment)
+                .commitAllowingStateLoss();
+    }
+
+    public void removeFragment(final Fragment fragment) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                getSupportFragmentManager().beginTransaction().remove(fragment).commitAllowingStateLoss();
+        }});
+    }
+
+    @Override
+    public void onBackPressed() {
+        hideLoadingDialog();
+
+        Fragment fragmentLogin = getSupportFragmentManager().findFragmentById(R.id.frame_login);
+        if (fragmentLogin != null && fragmentLogin instanceof LoginFragment) {
+            ((LoginFragment) fragmentLogin).pressKeyBack();
+            return;
+        }
+
+//        Fragment fragmentMain = getSupportFragmentManager().findFragmentById(R.id.frame_main);
+//        if (fragmentMain != null && fragmentMain instanceof MainFragment) {
+//            ((MainFragment) fragmentLogin).pressKeyBack();
+//            return;
+//        }
+
+        super.onBackPressed();
+    }
+
+    public void exitApp() {
+
+        BackDialog backDialog = new BackDialog(this, Constants.EXIT_APP_CONFIRM);
+        backDialog.setDialogListener(new DialogListener() {
+            @Override
+            public void onClickYes() {
+
+                finish();
+            }
+        });
+        backDialog.show();
     }
 
 }

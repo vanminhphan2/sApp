@@ -28,11 +28,15 @@ import com.team.s.sapp.api.AccountAPI;
 import com.team.s.sapp.api.ApiClient;
 import com.team.s.sapp.api.BoxApi;
 import com.team.s.sapp.api.RegisterApi;
+import com.team.s.sapp.dialog.BackDialog;
+import com.team.s.sapp.dialog.DialogListener;
 import com.team.s.sapp.dialog.LoadingDialog;
+import com.team.s.sapp.inf.MyCallBackLayout;
 import com.team.s.sapp.model.Account;
 import com.team.s.sapp.model.Box;
 import com.team.s.sapp.model.Profile;
 import com.team.s.sapp.model.Result;
+import com.team.s.sapp.util.Constants;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +48,8 @@ import butterknife.Unbinder;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.team.s.sapp.util.AppUtil.hideKeyboard;
 
 public class LoginFragment extends Fragment {
 
@@ -71,7 +77,7 @@ public class LoginFragment extends Fragment {
     @BindView(R.id.groupViewConfirmCode)
     Group groupViewConfirmCode;
     Unbinder unbinder;
- MainActivity mainActivity;
+    MainActivity mainActivity;
     private FirebaseAuth auth;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks verificationcallback;
     private PhoneAuthProvider.ForceResendingToken resendingToken;
@@ -84,7 +90,7 @@ public class LoginFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
         unbinder = ButterKnife.bind(this, view);
         auth = FirebaseAuth.getInstance();
-        mainActivity=MainActivity.mainActivity;
+        mainActivity = MainActivity.mainActivity;
         return view;
     }
 
@@ -99,9 +105,9 @@ public class LoginFragment extends Fragment {
 //                MainActivity.mainActivity.loadingDialog.show();
 //                MainActivity.mainActivity.login(edtPhone.getText().toString(),edtPass.getText().toString());
                 mainActivity.showLoadingDialog();
-                String phone= edtPhone.getText().toString();
-                String pass= edtPass.getText().toString();
-                login(phone,pass);
+                String phone = edtPhone.getText().toString();
+                String pass = edtPass.getText().toString();
+                login(phone, pass);
 
                 break;
 
@@ -242,7 +248,7 @@ public class LoginFragment extends Fragment {
 
     private void login(String phone, String password) {
         RegisterApi apiClient = ApiClient.getClient().create(RegisterApi.class);
-        Call<Result> call = apiClient.login(phone.trim(),password.trim());
+        Call<Result> call = apiClient.login(phone.trim(), password.trim());
         call.enqueue(new Callback<Result>() {
             @Override
             public void onResponse(Call<Result> call, Response<Result> response) {
@@ -252,10 +258,10 @@ public class LoginFragment extends Fragment {
                     Toast.makeText(getContext(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                     Profile user = response.body().getUserById();
                     MainActivity.mainActivity.loginSuccess(user);
-                } else if(response.body().getStatus().equals("incorrect phone")){
+                } else if (response.body().getStatus().equals("incorrect phone")) {
                     mainActivity.hideLoadingDialog();
                     Toast.makeText(getContext(), "Số điện thoại này chưa đăng kí!", Toast.LENGTH_SHORT).show();
-                }else if(response.body().getStatus().equals("incorrect password")){
+                } else if (response.body().getStatus().equals("incorrect password")) {
                     mainActivity.hideLoadingDialog();
                     Toast.makeText(getContext(), "Sai mật khẩu!", Toast.LENGTH_SHORT).show();
                 }
@@ -269,5 +275,12 @@ public class LoginFragment extends Fragment {
                 Toast.makeText(getContext(), "lỗi kết nối server!", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void pressKeyBack() {
+        hideKeyboard(mainActivity);
+        mainActivity.hideLoadingDialog();
+        mainActivity.exitApp();
+
     }
 }
