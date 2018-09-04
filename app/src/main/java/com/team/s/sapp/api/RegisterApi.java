@@ -17,6 +17,10 @@ public interface RegisterApi {
     Call<Result>  checkPhone(@Field("phone") String phone);
 
     @FormUrlEncoded
+    @POST("login.php")
+    Call<Result>  login(@Field("phone") String phone,@Field("password") String password);
+
+    @FormUrlEncoded
     @POST("register.php")
     Call<Result>   register(@Field("phone") String phone,
                             @Field("password") String password,

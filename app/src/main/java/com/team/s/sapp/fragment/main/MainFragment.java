@@ -36,6 +36,7 @@ public class MainFragment extends Fragment {
     StoryFragment storyFragment;
     ChatFragment chatFragment;
     MainFragment mainFragment;
+    MainActivity mainActivity;
 
     public Profile user;
 
@@ -52,6 +53,7 @@ public class MainFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         unbinder = ButterKnife.bind(this, view);
+        mainActivity=MainActivity.mainActivity;
         if(getArguments()!=null){
             user= (Profile) getArguments().getSerializable("USER_PROFILE");
         }
@@ -64,9 +66,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if(MainActivity.mainActivity.loadingDialog!=null)
-            if (MainActivity.mainActivity.loadingDialog.isShowing())
-                MainActivity.mainActivity.loadingDialog.hide();
+        mainActivity.hideLoadingDialog();
     }
 
     private void setupViewPager() {

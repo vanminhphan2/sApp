@@ -169,7 +169,6 @@ public class EditProfileFragment extends Fragment {
                         profile = new Profile();
                     setUserProfile();
                     uploadImageToFireBase(profile);
-//                    MainActivity.mainActivity.createUserProfile(profile);
                 }
                 else {
                     MainActivity.mainActivity.loadingDialog.hide();
@@ -258,7 +257,6 @@ public class EditProfileFragment extends Fragment {
                 if (response.body().getStatus().equals("success")) {
                     MainActivity.mainActivity.loadingDialog.hide();
                     Toast.makeText(getContext(), "createUser thanh cong", Toast.LENGTH_SHORT).show();
-                    Gson gson = new Gson(); // Or use new GsonBuilder().create();
                     Profile user = response.body().getUserById();
                     MainActivity.mainActivity.finishRegister(user);
                 } else {

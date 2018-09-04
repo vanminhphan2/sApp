@@ -121,13 +121,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void showDialog() {
+    public void showLoadingDialog() {
         if (loadingDialog != null && !loadingDialog.isShowing()) {
             loadingDialog.show();
         }
     }
 
-    public void hideDialog() {
+    public void hideLoadingDialog() {
         if (loadingDialog != null && loadingDialog.isShowing()) {
             loadingDialog.hide();
         }
@@ -267,6 +267,12 @@ public class MainActivity extends AppCompatActivity {
 //        userRef.child(idUser).setValue(profile);
         replaceMainFragment(user);
         removeEditProfileFragment();
+    }
+
+    public void loginSuccess(Profile profile) {
+        user = profile;
+        replaceMainFragment(user);
+        removeLoginFragment();
     }
 
     //Create a string with number param was input
