@@ -22,6 +22,7 @@ import com.team.s.sapp.dialog.NumberPickerDialog;
 import com.team.s.sapp.fragment.main.MainFragment;
 import com.team.s.sapp.inf.DialogNumberPickerListener;
 import com.team.s.sapp.model.Box;
+import com.team.s.sapp.util.AnimateUtils;
 
 import java.util.ArrayList;
 
@@ -29,6 +30,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+
+import static com.team.s.sapp.util.AnimateUtils.ANIM_DURATION_3;
+import static com.team.s.sapp.util.AnimateUtils.goneGroupViewAnim;
+import static com.team.s.sapp.util.AnimateUtils.visibleGroupViewAnim;
 
 public class ChatFragment extends Fragment {
 
@@ -70,14 +75,21 @@ public class ChatFragment extends Fragment {
     BoxAdapter boxAdapter;
     LinearLayoutManager linearLayoutManager;
     MainFragment mainFragment;
+    MainActivity mainActivity;
+    View[] groupViewChats, groupViewCalls;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
         unbinder = ButterKnife.bind(this, view);
+        mainActivity= MainActivity.mainActivity;
         if (MainActivity.mainActivity.isLiveMainFragment())
-            mainFragment = MainActivity.mainActivity.getMainFragment();
+            mainFragment = mainActivity.getMainFragment();
+
+        groupViewChats = new View[]{rvBox};
+        groupViewCalls = new View[]{tvGender, tvMale, cbMale, tvFemale, cbFemale,
+                tvAge, tvFrom, tvTo, tvCategory, tvFromAge, tvToAge,tvValueCategory};
         //temp
         boxArrayList = new ArrayList<>();
 
@@ -103,13 +115,19 @@ public class ChatFragment extends Fragment {
     public void setChangeLayout() {
 
         if (rvBox.getVisibility() == View.VISIBLE) {
-            rvBox.setVisibility(View.GONE);
+            AnimateUtils.startMyAnim(groupViewChats, mainActivity,
+                    ANIM_DURATION_3, R.anim.zoom_out, () -> rvBox.setVisibility(View.GONE));
             groupViewCall.setVisibility(View.VISIBLE);
+            AnimateUtils.SlideFadeInRight(groupViewCalls, mainActivity,
+                    ANIM_DURATION_3, () -> groupViewCall.setVisibility(View.VISIBLE));
+
             tvHeader.setText("Gọi cho người lạ");
             setChangeIconFab(false);
         } else {
-            rvBox.setVisibility(View.VISIBLE);
-            groupViewCall.setVisibility(View.GONE);
+            AnimateUtils.SlideFadeOutRight(groupViewCalls, mainActivity, ANIM_DURATION_3,
+                    () -> goneGroupViewAnim(groupViewCalls, groupViewCall));
+            AnimateUtils.startMyAnim(groupViewChats, mainActivity, ANIM_DURATION_3, R.anim.zoom_in,
+                    () -> rvBox.setVisibility(View.VISIBLE));
             tvHeader.setText("Tin nhắn");
             setChangeIconFab(true);
         }

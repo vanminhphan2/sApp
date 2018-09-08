@@ -24,6 +24,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
+import static com.team.s.sapp.util.AppUtil.hideKeyboard;
+
 public class MainFragment extends Fragment {
 
     @BindView(R.id.tab_main)
@@ -66,6 +68,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mainActivity.removeLoginFragment();
         mainActivity.hideLoadingDialog();
     }
 
@@ -83,5 +86,12 @@ public class MainFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    public void pressKeyBack() {
+        hideKeyboard(mainActivity);
+        mainActivity.hideLoadingDialog();
+        mainActivity.exitApp();
+
     }
 }

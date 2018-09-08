@@ -158,8 +158,6 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.frame_main, mainFragment)
                 .commitAllowingStateLoss();
-        if (loadingDialog.isShowing())
-            loadingDialog.hide();
     }
 
     public void replaceEditProfileFragment() {
@@ -262,7 +260,6 @@ public class MainActivity extends AppCompatActivity {
     public void loginSuccess(Profile profile) {
         user = profile;
         replaceMainFragment(user);
-        removeLoginFragment();
     }
 
     //Create a string with number param was input
@@ -497,6 +494,12 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragmentLogin = getSupportFragmentManager().findFragmentById(R.id.frame_login);
         if (fragmentLogin != null && fragmentLogin instanceof LoginFragment) {
             ((LoginFragment) fragmentLogin).pressKeyBack();
+            return;
+        }
+
+        Fragment fragmentMain = getSupportFragmentManager().findFragmentById(R.id.frame_main);
+        if (fragmentMain != null && fragmentMain instanceof MainFragment) {
+            ((MainFragment) fragmentMain).pressKeyBack();
             return;
         }
 
