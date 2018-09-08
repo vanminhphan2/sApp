@@ -221,9 +221,7 @@ public class LoginFragment extends Fragment {
                             Log.e(TAG, "signInWithCredential:success");
                             Toast.makeText(getContext(), "Xác nhận thành công!", Toast.LENGTH_SHORT).show();
                             mainActivity.hideLoadingDialog();
-                            groupViewConfirmCode.setVisibility(View.GONE);
-                            groupViewLogin.setVisibility(View.VISIBLE);
-                            MainActivity.mainActivity.registerPhoneOnFB(phoneRegister);
+                            MainActivity.mainActivity.verifySuccess(phoneRegister);
 
                         } else {
                             Log.e(TAG, "signInWithCredential:failure", task.getException());
@@ -280,7 +278,10 @@ public class LoginFragment extends Fragment {
                 if (response.body().getStatus().equals("success")) {
                     Toast.makeText(getContext(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                     Profile user = response.body().getUserById();
+                    Log.e("Rio result login", response.body().getUserById()+"");
                     hideKeyboard(mainActivity);
+                    user.setLogin(true);
+                    user.setOnline(true);
                     MainActivity.mainActivity.loginSuccess(user);
                 } else if (response.body().getStatus().equals("incorrect phone")) {
                     mainActivity.hideLoadingDialog();

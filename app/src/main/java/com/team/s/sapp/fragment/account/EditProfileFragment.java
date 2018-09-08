@@ -87,6 +87,7 @@ public class EditProfileFragment extends Fragment {
 
     private String phoneRegister;
     private Profile profile;
+    private MainActivity mainActivity;
 
     public static EditProfileFragment newInstance(String phone) {
         EditProfileFragment editProfileFragment = new EditProfileFragment();
@@ -102,6 +103,7 @@ public class EditProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_edit_profile, container, false);
 
         unbinder = ButterKnife.bind(this, view);
+        mainActivity= MainActivity.mainActivity;
         if (getArguments() != null) {
             phoneRegister = getArguments().getString("PHONE_REGISTER", "");
         } else {
@@ -119,8 +121,8 @@ public class EditProfileFragment extends Fragment {
         switch (view.getId()) {
 
             case R.id.img_user_edit:
-                MainActivity.mainActivity.getSingleImageFromGallery("Bạn muốn chọn ảnh này?");
-                MainActivity.mainActivity.setOnClickChooseImg(new MyOnClickItem() {
+                mainActivity.getSingleImageFromGallery("Bạn muốn chọn ảnh này?");
+                mainActivity.setOnClickChooseImg(new MyOnClickItem() {
                     @Override
                     public void onClickItem(View view, Object object, int position) {
                         String pathImg = (String) object;
@@ -163,7 +165,7 @@ public class EditProfileFragment extends Fragment {
                 break;
 
             case R.id.btn_save:
-                MainActivity.mainActivity.loadingDialog.show();
+                mainActivity.loadingDialog.show();
                 if (checkProfile()) {
                     if (profile == null)
                         profile = new Profile();
@@ -171,7 +173,7 @@ public class EditProfileFragment extends Fragment {
                     uploadImageToFireBase(profile);
                 }
                 else {
-                    MainActivity.mainActivity.loadingDialog.hide();
+                    mainActivity.loadingDialog.hide();
                 }
                 break;
         }
@@ -255,12 +257,14 @@ public class EditProfileFragment extends Fragment {
                 Log.e("Rio result createUser", response.body().getStatus().toString());
                 Log.e("Rio result createUser", response.body().getUserById().toString());
                 if (response.body().getStatus().equals("success")) {
-                    MainActivity.mainActivity.loadingDialog.hide();
+                    mainActivity.loadingDialog.hide();
                     Toast.makeText(getContext(), "createUser thanh cong", Toast.LENGTH_SHORT).show();
                     Profile user = response.body().getUserById();
-                    MainActivity.mainActivity.finishRegister(user);
+                    user.setLogin(true);
+                    user.setOnline(true);
+                    mainActivity.finishRegister(user);
                 } else {
-                    MainActivity.mainActivity.loadingDialog.hide();
+                    mainActivity.loadingDialog.hide();
                     Toast.makeText(getContext(), "createUser FAIL", Toast.LENGTH_SHORT).show();
                 }
 
@@ -282,7 +286,7 @@ public class EditProfileFragment extends Fragment {
         Bitmap bitmapImg = null;
         Float ratioImg = 0f;
         try {
-            bitmapImg = MainActivity.mainActivity.modifyOrientation(MainActivity.mainActivity.readBitmapAndScale(pathImg), pathImg);
+            bitmapImg = mainActivity.modifyOrientation(mainActivity.readBitmapAndScale(pathImg), pathImg);
             Float a = Float.valueOf(bitmapImg.getHeight());
             Float b = Float.valueOf(bitmapImg.getWidth());
             ratioImg = a / b;
@@ -293,9 +297,9 @@ public class EditProfileFragment extends Fragment {
         bitmapImg.compress(Bitmap.CompressFormat.PNG, 10, baos);
         byte[] data = baos.toByteArray();
 
-        String nameImg = MainActivity.mainActivity.getDateNow() + ".png";
+        String nameImg = mainActivity.getDateNow() + ".png";
         UploadTask uploadTask;
-        final StorageReference ref = MainActivity.mainActivity.storageRef.child("ImageUser").child(nameImg);
+        final StorageReference ref = mainActivity.storageRef.child("ImageUser").child(nameImg);
         uploadTask = ref.putBytes(data);
         profile.setRatioImage(ratioImg);
 

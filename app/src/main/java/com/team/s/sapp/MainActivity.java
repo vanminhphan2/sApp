@@ -239,26 +239,30 @@ public class MainActivity extends AppCompatActivity {
         return listBoxFireBase;
     }
 
-    public void registerPhoneOnFB(String phone) {
+    public void verifySuccess(String phone) {
 
-        userRef.child(phone).child("info").setValue(false);
         replaceEditProfileFragment(phone);
         removeLoginFragment();
     }
 
     public void finishRegister(Profile profile) {
 
-//        String idUser = getRandomString(5);
-//        profile.setId(idUser);
         user = profile;
-//        uploadImageToFireBase(profile.getImgUser(),idUser);
-//        userRef.child(idUser).setValue(profile);
+        setStatusUser(profile.getId(), profile.isOnline(),profile.isLogin());
         replaceMainFragment(user);
         removeEditProfileFragment();
     }
 
+    public void setStatusUser(int id, boolean isLogin, boolean isOnline){
+        String userId= String.valueOf(id);
+        userRef.child(userId).child("Online").setValue(isLogin);
+        userRef.child(userId).child("Login").setValue(isOnline);
+    }
+
     public void loginSuccess(Profile profile) {
+
         user = profile;
+        setStatusUser(profile.getId(), profile.isOnline(),profile.isLogin());
         replaceMainFragment(user);
     }
 
@@ -454,23 +458,6 @@ public class MainActivity extends AppCompatActivity {
         return formattedDate;
     }
 
-    public void showImageTranslation(RoundedImageView view) {
-        // Check that the device is running lollipop
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            PreviewImageFragment articleFragment = new PreviewImageFragment();
-            view.setTransitionName("ABCDEF");
-            fragmentManager.beginTransaction()
-                    .addSharedElement(view, ViewCompat.getTransitionName(view))
-                    .replace(R.id.frame_chat, articleFragment)
-                    .addToBackStack("TAG")
-                    .setReorderingAllowed(true) // Need for transition element
-                    .commit();
-        } else {
-            // Code to run on older devices
-        }
-    }
-
     private void replaceLoginFragment() {
 
         loginFragment = new LoginFragment();
@@ -502,12 +489,6 @@ public class MainActivity extends AppCompatActivity {
             ((MainFragment) fragmentMain).pressKeyBack();
             return;
         }
-
-//        Fragment fragmentMain = getSupportFragmentManager().findFragmentById(R.id.frame_main);
-//        if (fragmentMain != null && fragmentMain instanceof MainFragment) {
-//            ((MainFragment) fragmentLogin).pressKeyBack();
-//            return;
-//        }
 
         super.onBackPressed();
     }

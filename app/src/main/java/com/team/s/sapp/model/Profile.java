@@ -23,6 +23,9 @@ public class Profile implements Serializable {
     @SerializedName("ratioImage")
     private Float ratioImage;
 
+    private boolean isLogin;
+    private boolean isOnline;
+
     public Profile() {
     }
 
@@ -90,10 +93,26 @@ public class Profile implements Serializable {
         this.ratioImage = ratioImage;
     }
 
+    public boolean isLogin() {
+        return isLogin;
+    }
+
+    public void setLogin(boolean login) {
+        isLogin = login;
+    }
+
+    public boolean isOnline() {
+        return isOnline;
+    }
+
+    public void setOnline(boolean online) {
+        isOnline = online;
+    }
+
     @Override
     public String toString() {
         return "Profile{" +
-                "id='" + id + '\'' +
+                "id=" + id +
                 ", userName='" + userName + '\'' +
                 ", yearOfBirth=" + yearOfBirth +
                 ", imgUser='" + imgUser + '\'' +
@@ -101,6 +120,8 @@ public class Profile implements Serializable {
                 ", info=" + info +
                 ", phone='" + phone + '\'' +
                 ", ratioImage=" + ratioImage +
+                ", isLogin=" + isLogin +
+                ", isOnline=" + isOnline +
                 '}';
     }
 }
