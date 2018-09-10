@@ -262,6 +262,7 @@ public class EditProfileFragment extends Fragment {
                     Profile user = response.body().getUserById();
                     user.setLogin(true);
                     user.setOnline(true);
+                    mainActivity.saveLogin(phone, password);
                     mainActivity.finishRegister(user);
                 } else {
                     mainActivity.loadingDialog.hide();

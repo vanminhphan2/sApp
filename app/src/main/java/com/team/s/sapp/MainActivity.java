@@ -2,7 +2,9 @@ package com.team.s.sapp;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -20,6 +22,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -37,6 +40,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.team.s.sapp.activity.ImageViewerActivity;
+import com.team.s.sapp.api.ApiClient;
+import com.team.s.sapp.api.RegisterApi;
 import com.team.s.sapp.dialog.BackDialog;
 import com.team.s.sapp.dialog.DialogListener;
 import com.team.s.sapp.dialog.LoadingDialog;
@@ -51,6 +56,7 @@ import com.team.s.sapp.inf.MyOnClickItem;
 import com.team.s.sapp.model.Box;
 import com.team.s.sapp.model.Message;
 import com.team.s.sapp.model.Profile;
+import com.team.s.sapp.model.Result;
 import com.team.s.sapp.util.AnimateUtils;
 import com.team.s.sapp.util.Constants;
 
@@ -63,9 +69,15 @@ import java.util.Random;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.team.s.sapp.util.AppUtil.hideKeyboard;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
     static public int WIDTHDEVICE = 0;
 
     @BindView(R.id.frame_main)
@@ -93,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
     private MyOnClickItem onClickChooseImg;
     public LoadingDialog loadingDialog;
+    private boolean checkLogin = false;
 
 
     final public Handler mHandler = new Handler();
@@ -112,7 +125,17 @@ public class MainActivity extends AppCompatActivity {
         userRef = firebaseDatabase.getReference("Users");
         boxRef = firebaseDatabase.getReference("Boxs");
         loadingDialog = new LoadingDialog(this);
-        replaceLoginFragment();
+        if (isLogged()) {
+            loadingDialog.show();
+            checkLogin = true;
+            String phone = getPhoneLogged();
+            String password = getPassLogged();
+            login(phone, password);
+
+        } else {
+            checkLogin = false;
+            replaceLoginFragment();
+        }
 //        replaceChatFragment();
 
     }
@@ -141,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
 
 
     private void replaceChatFragment() {
@@ -248,21 +270,21 @@ public class MainActivity extends AppCompatActivity {
     public void finishRegister(Profile profile) {
 
         user = profile;
-        setStatusUser(profile.getId(), profile.isOnline(),profile.isLogin());
+        setStatusUser(profile.getId(), profile.isOnline(), profile.isLogin());
         replaceMainFragment(user);
         removeEditProfileFragment();
     }
 
-    public void setStatusUser(int id, boolean isLogin, boolean isOnline){
-        String userId= String.valueOf(id);
-        userRef.child(userId).child("Online").setValue(isLogin);
-        userRef.child(userId).child("Login").setValue(isOnline);
+    public void setStatusUser(int id, boolean isLogin, boolean isOnline) {
+        String userId = String.valueOf(id);
+        userRef.child(userId).child("Login").setValue(isLogin);
+        userRef.child(userId).child("Online").setValue(isOnline);
     }
 
     public void loginSuccess(Profile profile) {
 
         user = profile;
-        setStatusUser(profile.getId(), profile.isOnline(),profile.isLogin());
+        setStatusUser(profile.getId(), profile.isOnline(), profile.isLogin());
         replaceMainFragment(user);
     }
 
@@ -471,7 +493,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 getSupportFragmentManager().beginTransaction().remove(fragment).commitAllowingStateLoss();
-        }});
+            }
+        });
     }
 
     @Override
@@ -506,4 +529,107 @@ public class MainActivity extends AppCompatActivity {
         backDialog.show();
     }
 
+    @Override
+    public void onStart() {
+        if (user != null)
+            setStatusUser(user.getId(), true, true);
+        Log.e(TAG, "onStart:111");
+        super.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        if (user != null)
+            setStatusUser(user.getId(), true, true);
+        Log.e(TAG, "onResume:222");
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        if (user != null)
+            setStatusUser(user.getId(), true, false);
+        Log.e(TAG, "onPause:333");
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        if (user != null)
+            setStatusUser(user.getId(), true, false);
+        Log.e(TAG, "onStop:444");
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.e(TAG, "onDestroy:5555");
+        if (user != null)
+            setStatusUser(user.getId(), false, false);
+        super.onDestroy();
+    }
+
+    public void login(String phone, String password) {
+
+        RegisterApi apiClient = ApiClient.getClient().create(RegisterApi.class);
+        Call<Result> call = apiClient.login(phone.trim(), password.trim());
+        call.enqueue(new Callback<Result>() {
+            @Override
+            public void onResponse(Call<Result> call, Response<Result> response) {
+
+                Log.e("Rio result login", response.body().getStatus().toString());
+                if (response.body().getStatus().equals("success")) {
+                    if (!checkLogin)
+                        Toast.makeText(getApplicationContext(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                    Profile user = response.body().getUserById();
+                    Log.e("Rio result login", response.body().getUserById() + "");
+                    hideKeyboard(mainActivity);
+                    user.setLogin(true);
+                    user.setOnline(true);
+                    saveLogin(phone, password);
+                    loginSuccess(user);
+                } else if (response.body().getStatus().equals("incorrect phone")) {
+                    hideLoadingDialog();
+                    if (!checkLogin)
+                        Toast.makeText(getApplicationContext(), "Số điện thoại này chưa đăng kí!", Toast.LENGTH_SHORT).show();
+                } else if (response.body().getStatus().equals("incorrect password")) {
+                    hideLoadingDialog();
+                    if (!checkLogin)
+                        Toast.makeText(getApplicationContext(), "Sai mật khẩu!", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<Result> call, Throwable t) {
+                Log.e("Rio login error", t.toString());
+                mainActivity.hideLoadingDialog();
+                Toast.makeText(getApplicationContext(), "lỗi kết nối server!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private boolean isLogged() {
+        SharedPreferences sharedPreferences = getSharedPreferences("LOGIN", Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean("IS_LOGIN", false);
+    }
+
+    private String getPhoneLogged() {
+        SharedPreferences sharedPreferences = getSharedPreferences("LOGIN", Context.MODE_PRIVATE);
+        return sharedPreferences.getString("PHONE_LOGIN", "");
+    }
+
+    private String getPassLogged() {
+        SharedPreferences sharedPreferences = getSharedPreferences("LOGIN", Context.MODE_PRIVATE);
+        return sharedPreferences.getString("PASSWORD_LOGIN", "");
+    }
+
+    public void saveLogin(String phone, String pass) {
+        SharedPreferences sharedPreferences = getSharedPreferences("LOGIN", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("IS_LOGIN", true);
+        editor.putString("PHONE_LOGIN", phone);
+        editor.putString("PASSWORD_LOGIN", pass);
+        editor.apply();
+    }
 }

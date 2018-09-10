@@ -108,7 +108,7 @@ public class LoginFragment extends Fragment {
                 mainActivity.showLoadingDialog();
                 String phone = edtPhone.getText().toString();
                 String pass = edtPass.getText().toString();
-                login(phone, pass);
+                mainActivity.login(phone, pass);
 
                 break;
 
@@ -267,40 +267,7 @@ public class LoginFragment extends Fragment {
         });
     }
 
-    private void login(String phone, String password) {
-        RegisterApi apiClient = ApiClient.getClient().create(RegisterApi.class);
-        Call<Result> call = apiClient.login(phone.trim(), password.trim());
-        call.enqueue(new Callback<Result>() {
-            @Override
-            public void onResponse(Call<Result> call, Response<Result> response) {
 
-                Log.e("Rio result login", response.body().getStatus().toString());
-                if (response.body().getStatus().equals("success")) {
-                    Toast.makeText(getContext(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                    Profile user = response.body().getUserById();
-                    Log.e("Rio result login", response.body().getUserById()+"");
-                    hideKeyboard(mainActivity);
-                    user.setLogin(true);
-                    user.setOnline(true);
-                    MainActivity.mainActivity.loginSuccess(user);
-                } else if (response.body().getStatus().equals("incorrect phone")) {
-                    mainActivity.hideLoadingDialog();
-                    Toast.makeText(getContext(), "Số điện thoại này chưa đăng kí!", Toast.LENGTH_SHORT).show();
-                } else if (response.body().getStatus().equals("incorrect password")) {
-                    mainActivity.hideLoadingDialog();
-                    Toast.makeText(getContext(), "Sai mật khẩu!", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<Result> call, Throwable t) {
-                Log.e("Rio login error", t.toString());
-                mainActivity.hideLoadingDialog();
-                Toast.makeText(getContext(), "lỗi kết nối server!", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
     public void pressKeyBack() {
         hideKeyboard(mainActivity);
