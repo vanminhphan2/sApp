@@ -2,31 +2,27 @@ package com.team.s.sapp.fragment.main.story;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.team.s.sapp.R;
-import com.team.s.sapp.adapter.main.story.StoryAdapter;
+import com.team.s.sapp.adapter.main.story.StoriesFragment;
+import com.team.s.sapp.adapter.main.story.StoryFragmentAdapter;
+import com.team.s.sapp.adapter.main.story.custom.VerticalViewPager;
 import com.team.s.sapp.api.ApiClient;
 import com.team.s.sapp.api.GetStoryApi;
 import com.team.s.sapp.model.story.Stories;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,16 +36,17 @@ import retrofit2.Response;
 
 public class StoryFragment extends Fragment {
 
+
+    public static int item;
     Unbinder unbinder;
     @BindView(R.id.vp_story)
-    ViewPager rcvStory;
+    VerticalViewPager rcvStory;
     @BindView(R.id.fab_menu_story)      FloatingActionButton fab_menu;
     @BindView(R.id.fab_create_story)    FloatingActionButton fab_create;
     @BindView(R.id.layout)              ConstraintLayout room_layout;
 
     private List<Stories> storiesList;
-    private StoryAdapter pageradapter;
-    private int first_item = 0;
+    private StoryFragmentAdapter adapter;
 
     @Nullable
     @Override
@@ -60,16 +57,21 @@ public class StoryFragment extends Fragment {
         rcvStory.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i1) {
-
             }
 
             @Override
             public void onPageSelected(int i) {
+                item = i;
+
             }
 
             @Override
             public void onPageScrollStateChanged(int i) {
-                    StoryAdapter.mediaPlayer.pause();
+                if (StoriesFragment.mediaPlayer.isPlaying() || StoriesFragment.mediaPlayer != null)
+                {
+                    StoriesFragment.mediaPlayer.pause();
+                    StoriesFragment.dk = true;
+                }
             }
         });
         return view;
@@ -88,8 +90,9 @@ public class StoryFragment extends Fragment {
             public void onResponse(Call<List<Stories>> call, Response<List<Stories>> response) {
                 storiesList = response.body();
                 // pager adapter
-                pageradapter = new StoryAdapter(storiesList, getContext());
-                rcvStory.setAdapter(pageradapter);
+                adapter = new StoryFragmentAdapter(getFragmentManager(), storiesList);
+                rcvStory.setAdapter(adapter);
+                rcvStory.setOverScrollMode(View.OVER_SCROLL_NEVER);
             }
 
             @Override

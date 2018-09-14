@@ -3,7 +3,9 @@ package com.team.s.sapp.model.story;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Stories {
+import java.io.Serializable;
+
+public class Stories implements Serializable {
 
     @SerializedName("ID")
     @Expose
