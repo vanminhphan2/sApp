@@ -8,13 +8,13 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.team.s.sapp.R;
@@ -40,13 +40,34 @@ public class StoryFragment extends Fragment {
 
 
     public static int item;
-    public static  boolean touch = false;
+    public static boolean touch = false;
     Unbinder unbinder;
     @BindView(R.id.vp_story)
     VerticalViewPager rcvStory;
-    @BindView(R.id.fab_menu_story)      FloatingActionButton fab_menu;
-    @BindView(R.id.fab_create_story)    FloatingActionButton fab_create;
-    @BindView(R.id.layout)              ConstraintLayout room_layout;
+    @BindView(R.id.fab_menu_story)
+    FloatingActionButton fab_menu;
+    @BindView(R.id.fab_create_story)
+    FloatingActionButton fab_create;
+    @BindView(R.id.layout)
+    ConstraintLayout room_layout;
+    @BindView(R.id.img_cancel_story)
+    ImageView imgCancelStory;
+    @BindView(R.id.img_heart_story)
+    ImageView imgHeartStory;
+    @BindView(R.id.txt_heart_story)
+    TextView txtHeartStory;
+    @BindView(R.id.img_cmt_story)
+    ImageView imgCmtStory;
+    @BindView(R.id.txt_cmt_story)
+    TextView txtCmtStory;
+    @BindView(R.id.img_follow_story)
+    ImageView imgFollowStory;
+    @BindView(R.id.txt_follow_story)
+    TextView txtFollowStory;
+    @BindView(R.id.img_change_story)
+    ImageView imgChangeStory;
+    @BindView(R.id.txt_change_story)
+    TextView txtChangeStory;
 
     private List<Stories> storiesList;
     private StoryFragmentAdapter adapter;
@@ -54,7 +75,7 @@ public class StoryFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view= inflater.inflate(R.layout.fragment_story, container, false);
+        View view = inflater.inflate(R.layout.fragment_story, container, false);
         unbinder = ButterKnife.bind(this, view);
         loadStory();
         rcvStory.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -74,7 +95,6 @@ public class StoryFragment extends Fragment {
                     if (StoriesFragment.mediaPlayer.isPlaying()) {
                         StoriesFragment.mediaPlayer.pause();
                         StoriesFragment.dk = true;
-
                     }
                 }
             }
@@ -82,11 +102,8 @@ public class StoryFragment extends Fragment {
         return view;
     }
 
-
-    
     //
-    public void loadStory()
-    {
+    public void loadStory() {
         storiesList = new ArrayList<>();
         final GetStoryApi api = ApiClient.getClient().create(GetStoryApi.class);
         Call<List<Stories>> call = api.getStory();
@@ -108,15 +125,12 @@ public class StoryFragment extends Fragment {
 
     }
 
-
     // control event click
     @SuppressLint("RestrictedApi")
     @OnClick({R.id.fab_menu_story, R.id.fab_create_story, R.id.img_cancel_story, R.id.img_heart_story,
             R.id.img_cmt_story, R.id.img_follow_story, R.id.img_change_story})
-    public void ShowMenu(final View view)
-    {
-        switch (view.getId())
-        {
+    public void ShowMenu(final View view) {
+        switch (view.getId()) {
             case R.id.fab_menu_story:
                 ShowView();
                 break;
@@ -124,12 +138,15 @@ public class StoryFragment extends Fragment {
                 HideView();
                 break;
             case R.id.img_heart_story:
+                imgHeartStory.setBackgroundResource(R.drawable.ic_heart_red);
                 Toast.makeText(getContext(), "Liked", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.img_cmt_story:
+                imgCmtStory.setBackgroundResource(R.drawable.ic_comment_blue);
                 Toast.makeText(getContext(), "Commented", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.img_follow_story:
+                imgFollowStory.setBackgroundResource(R.drawable.ic_follow_us_blue);
                 Toast.makeText(getContext(), "Followed", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.img_change_story:
@@ -140,7 +157,7 @@ public class StoryFragment extends Fragment {
 
     // set animation for layout menu
     @SuppressLint("RestrictedApi")
-    private void ShowView(){
+    private void ShowView() {
         //animated fab
         Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.out_left);
         //animation.setDuration(1000);
@@ -156,7 +173,7 @@ public class StoryFragment extends Fragment {
 
     //hide animation menu
     @SuppressLint("RestrictedApi")
-    private void HideView(){
+    private void HideView() {
 
         //show and animated fab menu
         Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.in_right);
@@ -169,6 +186,13 @@ public class StoryFragment extends Fragment {
 
 
     }
-    //
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+
 }
 
