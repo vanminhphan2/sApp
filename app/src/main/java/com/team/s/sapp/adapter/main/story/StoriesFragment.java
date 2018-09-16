@@ -32,7 +32,7 @@ public class StoriesFragment extends Fragment {
 
     private Stories stories;
     public static boolean dk = false;
-    public static MediaPlayer mediaPlayer;
+    public static MediaPlayer mediaPlayer = null;
     public static int fragment_item;
 
     @BindView(R.id.constrant_audio)
@@ -189,5 +189,9 @@ public class StoriesFragment extends Fragment {
         }, 100);
     }
 
-
+    //
+    public void ChangePauseIcon()
+    {
+        pause.setBackgroundResource(R.drawable.ic_play_arrow);
+    }
 }

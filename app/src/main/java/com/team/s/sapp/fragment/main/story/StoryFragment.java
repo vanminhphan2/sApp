@@ -8,11 +8,13 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.team.s.sapp.R;
@@ -38,6 +40,7 @@ public class StoryFragment extends Fragment {
 
 
     public static int item;
+    public static  boolean touch = false;
     Unbinder unbinder;
     @BindView(R.id.vp_story)
     VerticalViewPager rcvStory;
@@ -67,10 +70,12 @@ public class StoryFragment extends Fragment {
 
             @Override
             public void onPageScrollStateChanged(int i) {
-                if (StoriesFragment.mediaPlayer.isPlaying() || StoriesFragment.mediaPlayer != null)
-                {
-                    StoriesFragment.mediaPlayer.pause();
-                    StoriesFragment.dk = true;
+                if (StoriesFragment.mediaPlayer != null) {
+                    if (StoriesFragment.mediaPlayer.isPlaying()) {
+                        StoriesFragment.mediaPlayer.pause();
+                        StoriesFragment.dk = true;
+
+                    }
                 }
             }
         });
@@ -165,6 +170,5 @@ public class StoryFragment extends Fragment {
 
     }
     //
-
 }
 
