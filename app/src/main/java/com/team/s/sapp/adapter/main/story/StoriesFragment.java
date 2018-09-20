@@ -31,7 +31,6 @@ import butterknife.ButterKnife;
 public class StoriesFragment extends Fragment {
 
     private Stories stories;
-    public static boolean dk = false;
     public static MediaPlayer mediaPlayer = null;
     public static int fragment_item;
 
@@ -55,6 +54,8 @@ public class StoriesFragment extends Fragment {
     TextView timeTotal;
     @BindView(R.id.tv_time_play)
     TextView timePlay;
+
+
 
     public static Fragment newInstance(Stories stories)
     {
@@ -81,7 +82,6 @@ public class StoriesFragment extends Fragment {
         topic_story.setText("#"+stories.getTopic());
         username.setText("@"+stories.getAccountName());
         Picasso.with(getContext()).load(stories.getImage()).into(background);
-
         play_audio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -116,11 +116,6 @@ public class StoriesFragment extends Fragment {
             }
         });
 
-        if (dk == true)
-        {
-            layout.setVisibility(View.GONE);
-            play_audio.setVisibility(View.VISIBLE);
-        }
         return view;
     }
 
@@ -189,9 +184,5 @@ public class StoriesFragment extends Fragment {
         }, 100);
     }
 
-    //
-    public void ChangePauseIcon()
-    {
-        pause.setBackgroundResource(R.drawable.ic_play_arrow);
-    }
+
 }

@@ -7,7 +7,9 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +42,6 @@ public class StoryFragment extends Fragment {
 
 
     public static int item;
-    public static boolean touch = false;
     Unbinder unbinder;
     @BindView(R.id.vp_story)
     VerticalViewPager rcvStory;
@@ -71,22 +72,28 @@ public class StoryFragment extends Fragment {
 
     private List<Stories> storiesList;
     private StoryFragmentAdapter adapter;
+    private FragmentManager fragmentManager;
+
+
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_story, container, false);
         unbinder = ButterKnife.bind(this, view);
+        fragmentManager = getFragmentManager();
         loadStory();
         rcvStory.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i1) {
+                Log.e("Pagescrolled i:", ""+i);
             }
 
             @Override
             public void onPageSelected(int i) {
+                Log.e("PageSelected position:", ""+i);
                 item = i;
-
             }
 
             @Override
@@ -94,13 +101,15 @@ public class StoryFragment extends Fragment {
                 if (StoriesFragment.mediaPlayer != null) {
                     if (StoriesFragment.mediaPlayer.isPlaying()) {
                         StoriesFragment.mediaPlayer.pause();
-                        StoriesFragment.dk = true;
                     }
                 }
+
             }
         });
         return view;
     }
+
+
 
     //
     public void loadStory() {
@@ -112,7 +121,7 @@ public class StoryFragment extends Fragment {
             public void onResponse(Call<List<Stories>> call, Response<List<Stories>> response) {
                 storiesList = response.body();
                 // pager adapter
-                adapter = new StoryFragmentAdapter(getFragmentManager(), storiesList);
+                adapter = new StoryFragmentAdapter(fragmentManager, storiesList);
                 rcvStory.setAdapter(adapter);
                 rcvStory.setOverScrollMode(View.OVER_SCROLL_NEVER);
             }
@@ -192,6 +201,7 @@ public class StoryFragment extends Fragment {
         super.onDestroyView();
         unbinder.unbind();
     }
+
 
 
 }
